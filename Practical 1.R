@@ -234,3 +234,35 @@ for(i in 1:length(sigma_seq)){
   # Plot emulator output in each case, note use of "paste" for plot title 
   plot_BL_emulator_V1(em_out=em_out,xP=xP,xD=xD,D=D,maintitle=paste("Sigma =",sigma_seq[i]))
 }
+
+
+## 5.1 Investigate the affect of varying correlation length parameter theta
+# Sequence of theta values to use for emulation
+theta_seq <- c(0.0005, 0.05, 0.2, 0.5, 1)
+
+# For loop over different theta values in sigma_seq 
+for(i in 1:length(theta_seq)){
+  # Evaluate emulator over 201 prediction points xP with sigma=sigma_seq[i] 
+  em_out <- t(sapply(xP,simple_BL_emulator_v1,xD=xD,D=D,theta=theta_seq[i],sigma=0.5,E_f=0))
+  
+  # Plot emulator output in each case, note use of "paste" for plot title 
+  plot_BL_emulator_V1(em_out=em_out,xP=xP,xD=xD,D=D,maintitle=paste("Theta =",theta_seq[i]))
+}
+
+
+## 5.2 Explore different locations for the 6 runs
+# Define a function based off the sequence of initial run locations
+location_variation <- function(xD){
+  # Perform 6 runs of model and store as D 
+  D <- f(xD)
+  
+  # Evaluate emulator over 201 prediction points xP 
+  em_out <- t(sapply(xP,simple_BL_emulator_v1,xD=xD,D=D,theta=0.25,sigma=0.5,E_f=0))  
+  
+  # Plot emulator output 
+  plot_BL_emulator_V1(em_out=em_out,xP=xP,xD=xD,D=D,maintitle="Emulator Output: 8 runs")
+  
+}
+
+# Try the emulator for different initials runs
+location_variation(c(0.4,0.1,0.2,0.8,0.9,0.6))
