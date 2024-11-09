@@ -132,7 +132,74 @@ emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
 
 ## 5. Colour Schemes for 2D Contour Plots
 
+# Will use library viridisLite and function hcl.colors()
+library(viridisLite)
+
+exp_cols <- magma
+var_cols <- function(n) hcl.colors(n, 'YlOrRd', rev=TRUE)
+diag_cols <- turbo
+
+# Trying some colour schemes out
+emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,        # this sets the colour scheme
+               main="Emulator Adjusted Expectation E_D[f(x)]")
+
+# Now for emulator variance
+emul_fill_cont(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=var_cols,
+               main="Emulator Adjusted Variance Var_D[f(x)]")
+
+# Evaluate true function and store in matrix for diagnostic comparisons to compare emulator against
+fxP_mat <- matrix(f(xP),nrow=length(x_grid),ncol=length(x_grid)) 
+
+emul_fill_cont(cont_mat=fxP_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,
+               main="True Computer Model Function f(x)")
+
+# Evaluate diagnostics S_D(x) and store in matrix
+S_diag_mat <- (E_D_fx_mat - fxP_mat) / sqrt(Var_D_fx_mat)
+
+emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
+               xD_col="purple",
+               color.palette=diag_cols,
+               main="Emulator Diagnostics S_D[f(x)]")
 
 
 
+## 6. Changing Correlation Lengths
 
+# Investigating impact of correlation length on emulator variance and expectation
+# Define a vector of theta values to use 
+theta_seq <- c(0.05,0.1,0.15,0.2,0.35,0.4,0.45)
+
+# Loop over vector of theta values 
+for(i in 1:length(theta_seq)){
+  
+  # Evaluate emulator over 201 prediction points xP and store in matrices 
+  em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=theta_seq[i],sigma=1,E_f=0))   
+  E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+  
+  # Plot filled contour plot of emulator expectation 
+  emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+                 color.palette=magma,main=paste("Emul. Adjusted Expectation E_D[f(x)], theta =",theta_seq[i]))
+}
+
+# Now checking emulator variance
+# Define a vector of theta values to use 
+theta_seq <- c(0.05,0.1,0.15,0.2,0.35,0.4,0.45)
+
+# Loop over vector of theta values 
+for(i in 1:length(theta_seq)){
+  
+  # Evaluate emulator over 201 prediction points xP and store in matrices 
+  em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=theta_seq[i],sigma=1,E_f=0))   
+  Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+  
+  # Plot filled contour plot of emulator expectation 
+  emul_fill_cont(cont_mat=Var_D_fx_mat,nlev=12,xD=xD,x_grid=x_grid,color.palette=var_cols,
+                 main=paste("Emul. Adjusted Variance Var_D[f(x)], theta =",theta_seq[i]))
+}
+
+
+
+## 7. Investigating Grid Designs
