@@ -248,7 +248,7 @@ for(i in 1:length(theta_seq)){
   # Plot emulator output in each case, note use of "paste" for plot title 
   plot_BL_emulator_V1(em_out=em_out,xP=xP,xD=xD,D=D,maintitle=paste("Theta =",theta_seq[i]))
 }
-
+ 
 
 ## 5.2 Explore different locations for the 6 runs
 # Define a function based off the sequence of initial run locations
