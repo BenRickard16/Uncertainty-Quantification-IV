@@ -203,3 +203,224 @@ for(i in 1:length(theta_seq)){
 
 
 ## 7. Investigating Grid Designs
+
+# Define run locations
+D_grid <- c(0.2,0.5,0.8)
+xD <- as.matrix(expand.grid("x1"=D_grid,"x2"=D_grid))
+
+# Perform 9 runs of model and store as D (this would takes days for realistic example!)
+D <- f(xD)
+
+# Evaluate emulator over 50x50=2500 prediction points xP and store as matrices
+em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=0.45,sigma=1,E_f=0))   
+E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate true function and store in matrix for diagnostic comparisons 
+fxP_mat <- matrix(f(xP),nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate diagnostics S_D(x) and store in matrix 
+S_diag_mat <- (E_D_fx_mat - fxP_mat) / sqrt(Var_D_fx_mat)
+
+
+# Plot emulator expectation, variance, true function, and diagnostics
+emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="Emulator Adjusted Expectation E_D[f(x)]")
+
+emul_fill_cont(cont_mat=fxP_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="True Computer Model Function f(x)")
+
+emul_fill_cont(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=var_cols,main="Emulator Adjusted Variance Var_D[f(x)]")
+
+emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
+               xD_col="purple",color.palette=diag_cols,main="Emulator Diagnostics S_D[f(x)]")
+
+
+## Exercise 7.1 - redo code with slightly larger grid based on
+D_grid <- c(0.1, 0.5, 0.9)
+xD <- as.matrix(expand.grid("x1"=D_grid,"x2"=D_grid))
+
+# Perform 9 runs of model and store as D (this would takes days for realistic example!)
+D <- f(xD)
+
+# Evaluate emulator over 50x50=2500 prediction points xP and store as matrices
+em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=0.45,sigma=1,E_f=0))   
+E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate true function and store in matrix for diagnostic comparisons 
+fxP_mat <- matrix(f(xP),nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate diagnostics S_D(x) and store in matrix 
+S_diag_mat <- (E_D_fx_mat - fxP_mat) / sqrt(Var_D_fx_mat)
+
+
+# Plot emulator expectation, variance, true function, and diagnostics
+emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="Emulator Adjusted Expectation E_D[f(x)]")
+
+emul_fill_cont(cont_mat=fxP_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="True Computer Model Function f(x)")
+
+emul_fill_cont(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=var_cols,main="Emulator Adjusted Variance Var_D[f(x)]")
+
+emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
+               xD_col="purple",color.palette=diag_cols,main="Emulator Diagnostics S_D[f(x)]")
+
+## Exercise 7.1 - create a 5x5 grid design
+D_grid <- seq(0, 1, 0.25)
+xD <- as.matrix(expand.grid("x1"=D_grid,"x2"=D_grid))
+
+# Perform 9 runs of model and store as D (this would takes days for realistic example!)
+D <- f(xD)
+
+# Evaluate emulator over 50x50=2500 prediction points xP and store as matrices
+em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=0.45,sigma=1,E_f=0))   
+E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate true function and store in matrix for diagnostic comparisons 
+fxP_mat <- matrix(f(xP),nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate diagnostics S_D(x) and store in matrix 
+S_diag_mat <- (E_D_fx_mat - fxP_mat) / sqrt(Var_D_fx_mat)
+
+
+# Plot emulator expectation, variance, true function, and diagnostics
+emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="Emulator Adjusted Expectation E_D[f(x)]")
+
+emul_fill_cont(cont_mat=fxP_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="True Computer Model Function f(x)")
+
+emul_fill_cont(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=var_cols,main="Emulator Adjusted Variance Var_D[f(x)]")
+
+emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
+               xD_col="purple",color.palette=diag_cols,main="Emulator Diagnostics S_D[f(x)]")
+
+
+
+## 8. Benefit of Latin Hypercube Designs
+
+# Define actual 2D computer model/simulator 
+f <- function(x) sin(3*pi*x[,1]) + (1/20)*cos(2*pi*x[,2]) 
+
+# Define run locations 
+D_grid <- c(0,1/3,2/3,1) 
+xD <- as.matrix(expand.grid("x1"=D_grid,"x2"=D_grid))
+
+# Perform 16 runs of model and store as D (this would takes days for realistic example!) 
+D <- f(xD)
+
+# Evaluate emulator over 50x50=2500 prediction points xP and store as matrices 
+em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=0.35,sigma=1,E_f=0))   
+E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate true function and store in matrix for diagnostic comparisons 
+fxP_mat <- matrix(f(xP),nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate diagnostics S_D(x) and store in matrix 
+S_diag_mat <- (E_D_fx_mat - fxP_mat) / sqrt(Var_D_fx_mat)
+
+
+# Now plot the emulator expectation, true function, emulator variance, and diagnostics
+# Emulator expectation
+emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="Emulator Adjusted Expectation E_D[f(x)]")
+
+# True function
+emul_fill_cont(cont_mat=fxP_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="True Computer Model Function f(x)")
+
+# Emulator variance
+emul_fill_cont(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=var_cols,main="Emulator Adjusted Variance Var_D[f(x)]")
+
+# Diagnostics
+emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
+               xD_col="purple",color.palette=diag_cols,main="Emulator Diagnostics S_D[f(x)]")
+
+# No we try a LHD using the algorithm from lectures
+# Set number of points in LHD 
+nl <- 16        # size of LHC
+
+# For each input, sample a permutation from 0:(nl-1)/nl, and cbind together 
+x_temp <- cbind("x1"=sample(0:(nl-1)),"x2"=sample(0:(nl-1))) / nl 
+x_temp
+
+# Plot with grid to see points are in bottom left of each box 
+plot(x_temp,xlim=c(0,1),ylim=c(0,1),pch=16,xaxs="i",yaxs="i",col="red",xlab="x1",ylab="x2",cex=1.4)
+abline(h=(0:nl)/nl,col="grey60")
+abline(v=(0:nl)/nl,col="grey60")
+
+# For Type 1 we add 1/(2*nl) to recenter in boxes 
+x_lhd <- x_temp + 0.5/nl
+x_lhd
+
+# Plot with grid to see points are now in centre of each box 
+plot(x_lhd,xlim=c(0,1),ylim=c(0,1),pch=16,xaxs="i",yaxs="i",col="red",xlab="x1",ylab="x2",cex=1.4)
+abline(h=(0:nl)/nl,col="grey60")
+abline(v=(0:nl)/nl,col="grey60")
+
+# We now attempt to improve the LHD by moving points close together further apart to get us closer
+# to LHD with maximum minimum distance between points
+
+# Create Type 1 LHD
+x_lhd <- cbind("x1"=sample(0:(nl-1)),"x2"=sample(0:(nl-1))) / nl  +  0.5/nl
+
+# Maximin loop: performs swaps on 1st of two closest points with another random point
+for(i in 1:1000){
+  mat <- as.matrix(dist(x_lhd)) + diag(10,nl)   # creates matrix of distances between points 
+  # note the inflated diagonal 
+  closest_runs <- which(mat==min(mat),arr.ind=TRUE) # finds pairs of closest runs
+  ind <- closest_runs[sample(nrow(closest_runs),1),1] # chooses one of close runs at random
+  swap_ind <- sample(setdiff(1:nl,ind),1)       # randomly selects another run to swap with
+  x_lhd2 <- x_lhd                               # creates second version of LHD
+  x_lhd2[ind[1],1]   <- x_lhd[swap_ind,1] # swaps x_1 values between 1st close run and other run
+  x_lhd2[swap_ind,1] <- x_lhd[ind[1],1]   # swaps x_1 values between 1st close run and other run
+  if(min(dist(x_lhd2)) >= min(dist(x_lhd))-0.00001) {  # if min distance between points is same or better
+    x_lhd <- x_lhd2                                      # we replace LHD with new LHD with the swap
+    cat("min dist =",min(dist(x_lhd)),"Iteration = ",i,"\n") # write out min dist between points
+  }
+}
+
+# Plot maximin LHD 
+plot(x_lhd,xlim=c(0,1),ylim=c(0,1),pch=16,xaxs="i",yaxs="i",col="blue",xlab="x1",ylab="x2",cex=1.4)
+abline(h=(0:nl)/nl,col="grey60")
+abline(v=(0:nl)/nl,col="grey60")
+
+# Now we use new Maximin LHD
+# Define run locations as the Maximin LHD found above 
+xD <- x_lhd 
+
+# Perform 16 runs of model and store as D (this would takes days for realistic example!) 
+D <- f(xD)
+
+# Evaluate emulator over 50x50=2500 prediction points xP and store as matrices 
+em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=0.35,sigma=1,E_f=0))   
+E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate true function and store in matrix for diagnostic comparisons 
+fxP_mat <- matrix(f(xP),nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Evaluate diagnostics S_D(x) and store in matrix 
+S_diag_mat <- (E_D_fx_mat - fxP_mat) / sqrt(Var_D_fx_mat)
+
+# Plot emulator expectation, variance, true function and diagnostics 
+emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="Emulator Adjusted Expectation E_D[f(x)]")
+
+emul_fill_cont(cont_mat=fxP_mat,cont_levs=seq(-2,2,0.2),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="True Computer Model Function f(x)")
+
+emul_fill_cont(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=var_cols,main="Emulator Adjusted Variance Var_D[f(x)]")
+
+emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
+               xD_col="purple",color.palette=diag_cols,main="Emulator Diagnostics S_D[f(x)]")
+
