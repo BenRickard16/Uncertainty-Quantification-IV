@@ -360,3 +360,117 @@ emul_fill_cont_V2(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
 
 ## 7. 2D History Matching: Wave 2
 
+# Pick 8 further points for our wave 2
+xD_w2 <- matrix(     # the 8 point wave 2 design (chosen by hand)
+  c(0.62,0.99,
+    0.98,0.28,
+    0.95,0.06,
+    0.04,0.05,
+    0.28,0.2,
+    0.04,0.4,
+    0.35,0.1,
+    0.22,0.36),ncol=2,byrow=TRUE)
+
+# Plot current runs in purple and remaining unevaluated wave 2 runs in pink 
+emul_fill_cont_V2(cont_mat=Imp_mat,cont_levs=imp_levs,cont_levs_lines=3,xD=rbind(xD,xD_w2),
+                  x_grid=x_grid,xD_col=rep(c("purple","pink"),c(nrow(xD),nrow(xD_w2))),
+                  color.palette=imp_cols,main="Implausibility I(x): Wave 1")
+
+# Loop over adding the wave 2 runs: add k runs 
+for(k in 0:8){                          # k=0: wave 1, k>0 add k wave 2 runs sequentially
+  
+  xD <- xD_w1                           # the 14 point wave 1 design
+  if(k>0) xD <- rbind(xD,xD_w2[1:k,])   # k=0: wave 1, k>0 add wave 2 runs sequentially
+  
+  # Perform 14 + k runs of model and store as D (would take days for realistic example!) 
+  D <- f(xD)
+  
+  # Evaluate emulator over 50x50=2500 prediction points xP and store as matrices 
+  em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=0.4,sigma=1,E_f=0))   
+  E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+  Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+  
+  # Evaluate true function and store in matrix for diagnostic comparisons 
+  fxP_mat <- matrix(f(xP),nrow=length(x_grid),ncol=length(x_grid)) 
+  
+  # Calculate Implausibility Measure Over All 50x50 = 2500 input points in xP 
+  Imp_mat <- sqrt( (E_D_fx_mat - z)^2 / (Var_D_fx_mat + sigma_e^2 + sigma_epsilon^2) ) 
+  
+  # Calculate Imp Measure for True f(x) Over All 50x50 = 2500 input points in xP 
+  Imp_true_mat <- sqrt( (fxP_mat - z)^2 / (sigma_e^2 + sigma_epsilon^2) ) 
+  
+  # Define colours and levels for implausibility plots 
+  imp_cols <- function(n) turbo(n,begin=0.15,end=1)
+  imp_levs <- c(0,seq(1,2.75,0.25),seq(3,18,2),20,30,41)
+  
+  # if k=0 plot wave 1 runs only 
+  if(k==0) emul_fill_cont_V2(cont_mat=Imp_mat,cont_levs=imp_levs,cont_levs_lines=3,xD=xD,
+                             x_grid=x_grid,xD_col="purple",color.palette=imp_cols,
+                             main="Implausibility I(x): Wave 1")
+  # plot current runs in purple and remaining unevaluated wave 2 runs in pink 
+  emul_fill_cont_V2(cont_mat=Imp_mat,cont_levs=imp_levs,cont_levs_lines=3,xD=rbind(xD,xD_w2),
+                    x_grid=x_grid,xD_col=rep(c("purple","pink"),c(nrow(xD)+k,nrow(xD_w2)-k)),  # cover unevaluated w2 points in pink
+                    color.palette=imp_cols,main="Implausibility I(x): Wave 2")
+  # once last run done so k=8, plot implausibility for true function f(x) to compare 
+  if(k==nrow(xD_w2)) emul_fill_cont_V2(cont_mat=Imp_true_mat,cont_levs=imp_levs,
+                                       cont_levs_lines=3,xD=xD,x_grid=x_grid,xD_col="purple",plot_xD=FALSE,
+                                       color.palette=imp_cols,main="Implausibility I(x) using True f(x)")
+}
+
+
+
+## 8. Iterative History Matching with Two Outputs
+
+# Define 2nd 2D computer model/simulator output f_2(x)
+f_2 <- function(x) 2*sin( 2*pi*(x[,2]/2 + 0 + (x[,1]-1)^2+(x[,2]-1)^2))
+
+# Use same run locations as before for both waves 1 and 2 
+xD <- rbind(xD_w1,xD_w2)   # use both wave 1 and wave 2 runs
+
+# Perform 14+8 runs of model and store as D (would take days for realistic example!) 
+D <- f_2(xD)
+
+# Evaluate emulator over 50x50=2500 prediction points xP and store as matrices 
+em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=0.35,sigma=1,E_f=0))   
+E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Defined Extra Objects for HM and Implausibility, for f_2 output 
+z_2 <- 1.9
+sigma_e_2 <- 0.1
+sigma_epsilon_2 <- 0.08
+
+# Evaluate true function f_2(x) and store in matrix for (possible) diag. comparisons 
+fxP_mat_2 <- matrix(f_2(xP),nrow=length(x_grid),ncol=length(x_grid)) 
+
+# Calculate Implausibility Measure Over All 50x50 = 2500 input points in xP 
+Imp_mat_2 <- sqrt( (E_D_fx_mat - z_2)^2 / (Var_D_fx_mat + sigma_e_2^2 + sigma_epsilon_2^2) )
+
+# Plot implausibility for each output after wave 2 
+emul_fill_cont_V2(cont_mat=Imp_mat,cont_levs=imp_levs,cont_levs_lines=3,xD=rbind(xD,xD_w2),
+                  x_grid=x_grid,xD_col="purple",color.palette=imp_cols,
+                  main="Output f_1(x): Implausibility I_1(x)")
+
+emul_fill_cont_V2(cont_mat=Imp_mat_2,cont_levs=imp_levs,cont_levs_lines=3,xD=rbind(xD,xD_w2),
+                  x_grid=x_grid,xD_col="purple",color.palette=imp_cols,
+                  main="Output f_2(x): Implausibility I_2(x)")
+
+# Combine two implausibilities from f and f_2 into I_M = max_i I_i(x) 
+# Convert matrices to vectors using c(), column bind using cbind(), then max using apply():
+max_Implaus <- apply(cbind(c(Imp_mat),c(Imp_mat_2)),1,max)  # vector of imps. Could use abind!
+max_Imp_mat <- matrix(max_Implaus,nrow=length(x_grid),ncol=length(x_grid)) # convert to matrix
+emul_fill_cont_V2(cont_mat=max_Imp_mat,cont_levs=imp_levs,cont_levs_lines=3,
+                  xD=rbind(xD,xD_w2),x_grid=x_grid,xD_col="purple",color.palette=imp_cols,
+                  main="Max Implausibility I_M(x)")
+
+
+
+
+
+
+
+
+
+
+
+
