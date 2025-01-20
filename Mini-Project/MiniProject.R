@@ -140,7 +140,8 @@ plot_BL_emulator_V1 <- function(
     xP,             # vector of nP inputs where emulator evaluated
     xD,             # the run input locations
     D,              # the run outputs D = (f(x^1),...,f(x^n))
-    maintitle=NULL  # title of the plot, blank if NULL
+    maintitle=NULL,
+    ...# title of the plot, blank if NULL
 ){
   
   ### plot emulator output ###
@@ -159,10 +160,64 @@ plot_BL_emulator_V1 <- function(
          lty=c(1,1,1,NA),pch=c(NA,NA,NA,16),col=c("blue","red",1,"green"),lwd=2.5,pt.cex=1.3)
 }
 
+em_out1 <- t(sapply(xP,simple_BL_emulator_v1,xD=xD,D=D,theta=0.25,sigma=1,E_f=15))
+em_out2 <- t(sapply(xP,simple_BL_emulator_v1,xD=xD,D=D,theta=0.25,sigma=2,E_f=15))
+em_out3 <- t(sapply(xP,simple_BL_emulator_v1,xD=xD,D=D,theta=0.25,sigma=3,E_f=15))
+em_out4 <- t(sapply(xP,simple_BL_emulator_v1,xD=xD,D=D,theta=0.25,sigma=4,E_f=15))
+plot_BL_emulator_V1(em_out=em_out,xP=xP,xD=xD,D=D,maintitle="Emulator Output: Sigma = 1")
 
-plot_BL_emulator_V1(em_out=em_out,xP=xP,xD=xD,D=D,maintitle="Emulator Output")
+plot(xP,em_out1[,"ExpD_f(x)"],ty="l",col="blue",lwd=2.5,
+     xlab=expression("x"[3]),ylab="f(x)",main='Emulator Output for Varying Prior Variance', ylim=c(12,22)) # main argument: plot title
+lines(xP,em_out1[,"ExpD_f(x)"]+3*sqrt(em_out1[,"VarD_f(x)"]),col="red",lwd=2.5)
+lines(xP,em_out1[,"ExpD_f(x)"]-3*sqrt(em_out1[,"VarD_f(x)"]),col="red",lwd=2.5)
+points(xD,D,pch=21,col=1,bg="green",cex=1.5)
+lines(xP,fried_x3(xP),lwd=2,lty=1)
+legend('bottomleft',legend=c("Emulator Expectation", "Emulator Prediction Interval",
+                             "True function f(x)","Model Evaluations"),
+       lty=c(1,1,1,NA),pch=c(NA,NA,NA,16),col=c("blue","red",1,"green"),lwd=2.5,pt.cex=1.3)
 
+plot(xP,em_out2[,"ExpD_f(x)"],ty="l",col="blue",lwd=2.5,
+     xlab=expression("x"[3]),ylab="f(x)",main='Emulator Output: Theta = 0.2', ylim=c(12,22)) # main argument: plot title
+lines(xP,em_out2[,"ExpD_f(x)"]+3*sqrt(em_out2[,"VarD_f(x)"]),col="orange",lwd=2.5)
+lines(xP,em_out2[,"ExpD_f(x)"]-3*sqrt(em_out2[,"VarD_f(x)"]),col="orange",lwd=2.5)
+points(xD,D,pch=21,col=1,bg="green",cex=1.5)
+lines(xP,fried_x3(xP),lwd=2,lty=1)
+legend('bottomleft',legend=c("Emulator Expectation", "Emulator Prediction Interval",
+                             "True function f(x)","Model Evaluations"),
+       lty=c(1,1,1,NA),pch=c(NA,NA,NA,16),col=c("blue","red",1,"green"),lwd=2.5,pt.cex=1.3)
 
+plot(xP,em_out3[,"ExpD_f(x)"],ty="l",col="blue",lwd=2.5,
+     xlab=expression("x"[3]),ylab="f(x)",main='Emulator Output: Theta = 0.3', ylim=c(12,22)) # main argument: plot title
+lines(xP,em_out3[,"ExpD_f(x)"]+3*sqrt(em_out3[,"VarD_f(x)"]),col="yellow",lwd=2.5)
+lines(xP,em_out3[,"ExpD_f(x)"]-3*sqrt(em_out3[,"VarD_f(x)"]),col="yellow",lwd=2.5)
+points(xD,D,pch=21,col=1,bg="green",cex=1.5)
+lines(xP,fried_x3(xP),lwd=2,lty=1)
+legend('bottomleft',legend=c("Emulator Expectation", "Emulator Prediction Interval",
+                             "True function f(x)","Model Evaluations"),
+       lty=c(1,1,1,NA),pch=c(NA,NA,NA,16),col=c("blue","red",1,"green"),lwd=2.5,pt.cex=1.3)
+
+plot(xP,em_out3[,"ExpD_f(x)"],ty="l",col="blue",lwd=2.5,
+     xlab=expression("x"[3]),ylab="f(x)",main='Emulator Output: Theta = 0.4', ylim=c(12,22)) # main argument: plot title
+lines(xP,em_out4[,"ExpD_f(x)"]+3*sqrt(em_out4[,"VarD_f(x)"]),col="pink",lwd=2.5)
+lines(xP,em_out4[,"ExpD_f(x)"]-3*sqrt(em_out4[,"VarD_f(x)"]),col="pink",lwd=2.5)
+points(xD,D,pch=21,col=1,bg="green",cex=1.5)
+lines(xP,fried_x3(xP),lwd=2,lty=1)
+legend('bottomleft',legend=c("Emulator Expectation",
+                             "True function f(x)","Model Evaluations"),
+       lty=c(1,1,NA),pch=c(NA,NA,16),col=c("blue",1,"green"),lwd=2.5,pt.cex=1.3)
+### plot true function: we would not normally be able to do this! ###
+lines(xP,fried_x3(xP),lwd=2,lty=1)
+
+### Plot the runs ###
+points(xD,D,pch=21,col=1,bg="green",cex=1.5)
+legend('bottomleft',legend=c("Emulator Expectation",
+                             "True function f(x)","Model Evaluations"),
+       lty=c(1,1,NA),pch=c(NA,NA,16),col=c("blue",1,"green"),lwd=2.5,pt.cex=1.3)
+legend('bottomright',        legend = c(expression("Pred. Interval: " ~ sigma^2 == 1), 
+                                        expression("Pred. Interval: " ~ sigma^2 == 2), 
+                                        expression("Pred. Interval: " ~ sigma^2 == 3), 
+                                        expression("Pred. Interval: " ~ sigma^2 == 4)),
+       lty=c(1,1,1,1),pch=c(NA,NA,NA,NA),col=c("red",'orange',"yellow", 'pink'),lwd=2.5,pt.cex=1.5)
 ## 5. Demonstrate 2D Emulation
 
 # Define simple Bayes Linear emulator for single input in 2D ###
@@ -358,6 +413,131 @@ emul_fill_cont(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
 emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
                xD_col="purple",color.palette=diag_cols,main="Emulator Diagnostics")
 
+### Define a vector of theta values to use ###
+theta_seq <- c(0.1,0.3,0.5,0.7)
+
+### loop over vector of theta values ###
+for(i in 1:length(theta_seq)){
+  
+  ### Evaluate emulator over 201 prediction points xP and store in matrices ###
+  em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=theta_seq[i],sigma=4,E_f=15))   
+  E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid))
+  
+  ### Plot filled contour plot of emulator expectation ###
+  emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=seq(6,22,1),xD=xD,x_grid=x_grid,
+                 color.palette=exp_cols,main=paste("Emulator Adjusted Expectation, Theta =",theta_seq[i]))
+}
+
+### loop over vector of theta values ###
+for(i in 1:length(theta_seq)){
+  
+  ### Evaluate emulator over 201 prediction points xP and store in matrices ###
+  em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=theta_seq[i],sigma=4,E_f=15))   
+  Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid))
+  
+  ### Plot filled contour plot of emulator expectation ###
+  emul_fill_cont(cont_mat=Var_D_fx_mat,nlev=12,xD=xD,x_grid=x_grid,color.palette=var_cols,
+                 main=paste("Emulator Variance, Theta =",theta_seq[i]))
+}
+
+### loop over vector of theta values ###
+for(i in 1:length(theta_seq)){
+  
+  ### Evaluate emulator over 201 prediction points xP and store in matrices ###
+  em_out <- t(apply(xP,1,simple_BL_emulator_v2,xD=xD,D=D,theta=theta_seq[i],sigma=4,E_f=15))   
+  Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid))
+  S_diag_mat <- (E_D_fx_mat - fxP_mat) / sqrt(Var_D_fx_mat)
+  ### Plot filled contour plot of emulator expectation ###
+  emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
+                 xD_col="purple",color.palette=diag_cols,main=paste("Emulator Diagnostics, Theta =",theta_seq[i]))
+}
+
+
+### Define more efficient Bayes Linear emulator for Multiple inputs in 2D ###
+
+simple_BL_emulator_v3 <- function(xP,             # the set of emulator prediction points
+                                  xD,             # the run input locations xD
+                                  D,              # the run outputs D = (f(x^1),...,f(x^n))
+                                  theta = 1,      # the correlation lengths (can be a vector)
+                                  sigma = 1,      # the prior SD sigma sqrt(Var[f(x)])
+                                  E_f = 0,         # prior expectation of f: E(f(x)) = 0 
+                                  using_pdist = 1  # if you have installed pdist package
+){
+  
+  # store length of runs D and number of prediction points xP
+  n <- length(D)
+  nP <- nrow(xP)       # XXX New V3
+  
+  # # Rescale each input by theta. Works for different theta for each input and for same theta
+  xP <- t(t(xP)/theta)     # XXX New V3: solution to Exercise 8.3, CP 3.
+  xD <- t(t(xD)/theta)     # XXX New V3: solution to Exercise 8.3, CP 3.
+  
+  ### Define Cov structure of f(x): Cov[f(x),f(xdash)], now to act on matrix of distances ###
+  # Cov_fx_fxdash <- function(x,xdash) sig^2 * exp(-sum((x-xdash)^2)/theta^2) # XXX Old V2
+  Cov_fx_fxdash <- function(dist_matrix) sigma^2 * exp(-(dist_matrix)^2) # XXX New dist V3
+  
+  
+  ### Define 5 objects needed for BL adjustment ###
+  # Create E[D] vector
+  E_D <- rep(E_f,n)
+  
+  # Create Var_D matrix:
+  # Var_D <- matrix(0,nrow=n,ncol=n)                                        # XXX Old V2
+  # for(i in 1:n) for(j in 1:n) Var_D[i,j] <- Cov_fx_fxdash(xD[i,],xD[j,])  # XXX Old V2
+  Var_D <- Cov_fx_fxdash( as.matrix(dist(xD)) )                       # XXX New dist V3
+  
+  # Create E[f(x)]
+  E_fx <- rep(E_f,nP)
+  
+  # Create Var_f(x) 
+  Var_fx <- rep(sigma^2,nP)
+  
+  # Create Cov_fx_D row vector now using pdist() function if available, if not use dist()
+  # Cov_fx_D <- matrix(0,nrow=1,ncol=n)                       # XXX Old V2
+  # for(j in 1:n) Cov_fx_D[1,j] <- Cov_fx_fxdash(x,xD[j,])    # XXX Old V2
+  if(using_pdist)  Cov_fx_D <- Cov_fx_fxdash( as.matrix(pdist(xP,xD)) )   # XXX New V3
+  if(!using_pdist) 
+    Cov_fx_D <- Cov_fx_fxdash( as.matrix(dist(rbind(xP,xD)))[1:nP,(nP+1):(nP+n)] )# XXX NewV3
+  
+  # find inverse of Var_D using Cholesky decomposition (check Wikipedia if interested!)
+  Var_D_inv <- chol2inv(chol(Var_D))     # more efficient way to calculate inverse of Cov mat
+  
+  ### Perform Bayes Linear adjustment to find Adjusted Expectation and Variance of f(x) ###
+  cov_fx_D_Var_D_inv <- Cov_fx_D %*% Var_D_inv  # Need this twice so pre-calculate here
+  ED_fx   <-  E_fx + cov_fx_D_Var_D_inv %*% (D - E_D) # adj. expectation of ALL xP pts at once
+  # VarD_fx <-  Var_fx - cov_fx_D_Var_D_inv %*% t(Cov_fx_D)       # XXX Old V2
+  VarD_fx   <-  Var_fx - apply(cov_fx_D_Var_D_inv * Cov_fx_D,1,sum) # fast way to get diagonals 
+  # and hence all nP variances (Note: does not do full np x np covariance matrix)
+  
+  ### return emulator expectation and variance ###
+  return(cbind("ExpD_f(x)"=c(ED_fx),"VarD_f(x)"=VarD_fx))  
+  
+}
+### Define run locations as the Maximin LHD found above ###
+xD <- x_lhd 
+
+### Perform 16 runs of model and store as D (this would takes days for realistic example!) ###
+D <- f(xD)
+
+### Define 50x50 grid of prediction points xP for emulator evaluation ###
+x_grid <- seq(-0.001,1.001,len=50)
+xP <- as.matrix(expand.grid("x1"=x_grid,"x2"=x_grid))
+### Evaluate emulator over 50x50=2500 prediction points xP and store as matrices ###
+em_out <- simple_BL_emulator_v3(xP=xP,xD=xD,D=D,theta=c(0.5,1.4),sigma=4,E_f=15,using_pdist = 1)    
+E_D_fx_mat <- matrix(em_out[,"ExpD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+Var_D_fx_mat <- matrix(em_out[,"VarD_f(x)"],nrow=length(x_grid),ncol=length(x_grid)) 
+
+emul_fill_cont(cont_mat=E_D_fx_mat,cont_levs=seq(6,22,1),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="Emulator Adjusted Expectation")
+
+emul_fill_cont(cont_mat=fxP_mat,cont_levs=seq(6,22,1),xD=xD,x_grid=x_grid,
+               color.palette=exp_cols,main="Friedman Function")
+
+emul_fill_cont(cont_mat=Var_D_fx_mat,cont_levs=NULL,xD=xD,x_grid=x_grid,
+               color.palette=var_cols,main="Emulator Adjusted Variance")
+
+emul_fill_cont(cont_mat=S_diag_mat,cont_levs=seq(-3,3,0.25),xD=xD,x_grid=x_grid,
+               xD_col="purple",color.palette=diag_cols,main="Emulator Diagnostics")
 
 ################ History Matching ###################
 lhd_maximin <- function(nl=16){                    # nl = number of points in LHD 
@@ -507,3 +687,5 @@ for(k in 0:8){                          # k=0: wave 1, k>0 add k wave 2 runs seq
                                        cont_levs_lines=3*sqrt(sigma_e^2 + sigma_epsilon^2),xD=xD,x_grid=x_grid,xD_col="purple",plot_xD=FALSE,
                                        color.palette=imp_cols,main="Implausibility using Friedman Function")
 }
+
+
